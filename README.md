@@ -47,8 +47,8 @@ Latest run against the deployed backend (Render + Groq + Supabase):
 
 | Metric | Score |
 |---|---|
-| Overall accuracy | 86.5% (32/37) |
-| Answerable-question accuracy | 84.8% |
+| Overall accuracy | 92% (34/37) |
+| Answerable-question accuracy | 88.9% |
 | Correct-refusal rate (out-of-scope questions) | 100% |
 
 The system never hallucinated an answer to a question outside the document's
