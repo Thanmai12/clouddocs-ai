@@ -8,7 +8,14 @@ _client = Groq(api_key=settings.groq_api_key)
 SYSTEM_PROMPT = """You are a document Q&A assistant. Answer the user's question using ONLY the
 provided source passages. If the passages do not contain enough information to answer,
 say clearly that the document does not mention it — do not guess or use outside knowledge.
-Keep answers concise and directly grounded in the passages."""
+
+Format your answer for readability:
+- Keep it concise and directly grounded in the passages
+- Use short paragraphs (2-3 sentences max)
+- Use a bulleted list when listing multiple items, steps, or conditions
+- Use **bold** for key terms, numbers, or dates the user is likely looking for
+- Never write a single dense wall of text — break it up
+"""
 
 
 def answer_question(document_id: str, question: str) -> dict:
