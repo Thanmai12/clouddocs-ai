@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Processing — CloudDocs AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="assets/config.js"></script>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark"><i data-lucide="cloud" style="width:16px;height:16px;color:white;"></i></div>CloudDocs AI</div>
+    <a class="side-link" href="dashboard.html"><i data-lucide="layout-dashboard" style="width:17px;height:17px;"></i>Dashboard</a>
+    <a class="side-link active" href="upload.html"><i data-lucide="upload-cloud" style="width:17px;height:17px;"></i>Upload Document</a>
+    <a class="side-link" href="#"><i data-lucide="folder" style="width:17px;height:17px;"></i>My Documents</a>
+    <a class="side-link" href="chat.html"><i data-lucide="message-circle-question" style="width:17px;height:17px;"></i>Ask Questions</a>
+    <a class="side-link" href="#"><i data-lucide="settings" style="width:17px;height:17px;"></i>Settings</a>
+    <div class="sidebar-footer">
+      <div class="groq-title"><i data-lucide="zap" style="width:14px;height:14px;color:#F5C94B;"></i> Groq</div>
+      <div class="groq-sub">Fast · Free · Llama 3</div>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <div class="processing-wrap">
+      <div class="processing-icon"><i data-lucide="file-cog" style="width:34px;height:34px;color:#4F46E5;"></i></div>
+      <h1>Processing Your Document...</h1>
+      <p>This may take a few minutes. You can leave this page and we'll notify you when it's ready.</p>
+
+      <div class="pipeline" id="pipeline"></div>
+
+      <div class="card status-card" id="statusCard"></div>
+      <div id="processingError" style="display:none;color:#DC2626;font-size:13.5px;margin-top:18px;font-weight:600;"></div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/api.js"></script>
+<script>
+  lucide.createIcons();
+
+  const STEPS = [
+    { key: 'uploaded',   label: 'Uploaded',            sub: 'File received' },
+    { key: 'extracting', label: 'Extracting text',     sub: 'Reading your document...' },
+    { key: 'chunking',   label: 'Chunking',             sub: 'Splitting into meaningful sections...' },
+    { key: 'embedding',  label: 'Creating embeddings', sub: 'Converting to vector representations...' },
+    { key: 'indexing',   label: 'Indexing',             sub: 'Storing in vector database...' },
+  ];
+  const ORDER = STEPS.map(s => s.key);
+
+  const params = new URLSearchParams(window.location.search);
+  const documentId = params.get('id');
+  const pipelineEl = document.getElementById('pipeline');
+  const statusCardEl = document.getElementById('statusCard');
+  const errorEl = document.getElementById('processingError');
+
+  function render(currentStatus) {
+    const currentIdx = ORDER.indexOf(currentStatus);
+
+    pipelineEl.innerHTML = STEPS.map((s, i) => {
+      let dotClass = 'waiting', inner = i + 1, sub = 'Waiting...';
+      if (i < currentIdx || currentStatus === 'ready') { dotClass = 'done'; inner = '<i data-lucide="check" style="width:16px;height:16px;"></i>'; sub = '✓ Done'; }
+      else if (i === currentIdx) { dotClass = 'active'; inner = '<i data-lucide="loader-circle" style="width:16px;height:16px;"></i>'; sub = 'In progress...'; }
+      return `<div class="pipe-step">${i > 0 ? `<div class="pipe-line ${i <= currentIdx || currentStatus === 'ready' ? 'done' : ''}"></div>` : ''}
+        <div class="pipe-dot ${dotClass}">${inner}</div>
+        <div class="pipe-label">${s.label}</div><div class="pipe-sub">${sub}</div></div>`;
+    }).join('');
+
+    statusCardEl.innerHTML = `<div style="font-weight:650;font-size:13.5px;margin-bottom:6px;">What's happening?</div>` +
+      STEPS.map((s, i) => {
+        let dotClass = 'waiting', dotInner = '', textStyle = 'color:var(--slate-400);';
+        if (i < currentIdx || currentStatus === 'ready') { dotClass = 'done'; dotInner = '<i data-lucide="check" style="width:12px;height:12px;"></i>'; textStyle = ''; }
+        else if (i === currentIdx) { dotClass = 'active'; textStyle = ''; }
+        return `<div class="status-row">
+          <div class="status-dot ${dotClass}">${dotInner}</div>
+          <div class="status-text" style="${textStyle}"><b style="${textStyle}">${s.label}</b><span>${s.sub}</span></div>
+        </div>`;
+      }).join('');
+
+    lucide.createIcons();
+  }
+
+  async function poll() {
+    if (!documentId) {
+      errorEl.textContent = 'No document ID found — please upload a document first.';
+      errorEl.style.display = 'block';
+      return;
+    }
+    try {
+      const doc = await apiGetDocument(documentId);
+      if (doc.status === 'failed') {
+        errorEl.textContent = doc.error_message || 'Processing failed.';
+        errorEl.style.display = 'block';
+        render('indexing');
+        return;
+      }
+      render(doc.status);
+      if (doc.status === 'ready') {
+        setTimeout(() => { window.location.href = `chat.html?id=${documentId}`; }, 1200);
+        return;
+      }
+      setTimeout(poll, 2000);
+    } catch (err) {
+      errorEl.textContent = err.message;
+      errorEl.style.display = 'block';
+      setTimeout(poll, 3000);
+    }
+  }
+
+  render('uploaded');
+  poll();
+</script>
+</body>
+</html>

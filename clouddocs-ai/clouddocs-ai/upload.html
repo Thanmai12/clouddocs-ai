@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Document — CloudDocs AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="assets/config.js"></script>
+<script src="assets/api.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <nav class="topnav">
+    <a href="index.html" class="brand"><div class="brand-mark"><i data-lucide="cloud" style="width:16px;height:16px;color:white;"></i></div>CloudDocs AI</a>
+    <div class="avatar"></div>
+  </nav>
+
+  <div class="upload-layout">
+    <div class="step-list">
+      <div class="step-item active">
+        <div class="step-num">1</div>
+        <div><div class="step-title">Upload File</div><div class="step-sub">PDF or TXT</div></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div><div class="step-title">Processing</div><div class="step-sub">(Background)</div></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div><div class="step-title">Indexing</div><div class="step-sub">(Vector Database)</div></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div><div class="step-title">Ready</div><div class="step-sub">(Start Asking Questions)</div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon"><i data-lucide="upload-cloud" style="width:28px;height:28px;"></i></div>
+        <h2>Upload Your Document</h2>
+        <p>Choose a PDF or text file. We'll handle the rest.</p>
+
+        <div class="file-tile">
+          <i data-lucide="file-text" style="width:26px;height:26px;"></i>
+          <div>Drag &amp; drop your file here</div>
+          <div style="font-size:12px;">or</div>
+        </div>
+
+        <button class="btn-primary" id="chooseFileBtn" type="button">Choose File</button>
+        <input type="file" id="fileInput" accept=".pdf,.txt" style="display:none;">
+        <div id="uploadError" style="display:none;color:#DC2626;font-size:13px;margin-top:14px;font-weight:600;"></div>
+        <div id="uploadingMsg" style="display:none;color:var(--slate-600);font-size:13px;margin-top:14px;">Uploading...</div>
+
+        <p style="font-size:12px;color:var(--slate-400);margin-top:18px;">Supported formats: PDF, TXT &nbsp;|&nbsp; Max size: 10MB</p>
+      </div>
+
+      <div class="hint-strip">
+        <i data-lucide="info" style="width:16px;height:16px;flex-shrink:0;"></i>
+        Your document will be automatically processed in the background (extract → chunk → embed → index).
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+  const errorBox = document.getElementById('uploadError');
+  const uploadingMsg = document.getElementById('uploadingMsg');
+
+  document.getElementById('chooseFileBtn').addEventListener('click', () => {
+    document.getElementById('fileInput').click();
+  });
+
+  document.getElementById('fileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    errorBox.style.display = 'none';
+    uploadingMsg.style.display = 'block';
+
+    try {
+      const doc = await apiUpload(file);
+      // Pass the real document id forward so processing.html can poll its actual status.
+      window.location.href = `processing.html?id=${doc.id}`;
+    } catch (err) {
+      uploadingMsg.style.display = 'none';
+      errorBox.textContent = err.message || 'Something went wrong uploading the file.';
+      errorBox.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>
