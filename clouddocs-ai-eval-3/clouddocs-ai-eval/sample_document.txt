@@ -1,0 +1,56 @@
+CloudCart Customer Policy Handbook
+
+Section 1: Returns and Refunds
+We accept returns within 30 days of purchase, as long as the item is unused and in its
+original packaging. Refunds are processed within 5-7 business days after the return is
+received. Sale items marked "Final Sale" cannot be returned. Customers are responsible
+for return shipping costs unless the item arrived damaged or defective.
+
+Section 2: Shipping
+Standard shipping takes 4-6 business days within India and is free for orders over
+Rs. 999. Express shipping costs Rs. 199 and delivers within 2 business days. We do not
+currently ship internationally. Orders placed before 2 PM IST ship the same day.
+
+Section 3: Warranty
+All electronics purchased from CloudCart come with a 12-month manufacturer warranty
+covering defects in materials and workmanship. The warranty does not cover accidental
+damage, water damage, or unauthorized repairs. To claim warranty service, customers
+must provide the original invoice.
+
+Section 4: Payment Methods
+We accept credit cards, debit cards, UPI, and net banking. We do not accept cash on
+delivery for orders above Rs. 10,000. All payments are processed securely through
+Razorpay, and CloudCart never stores full card numbers on its own servers.
+
+Section 5: Account and Privacy
+Customers can create an account using their email or phone number. We retain order
+history and account data for 3 years after the last activity, after which it is
+automatically deleted upon request. Customers can request full account deletion by
+emailing privacy@cloudcart.example. We do not sell customer data to third parties.
+
+Section 6: Subscription Plans
+CloudCart Plus is a subscription costing Rs. 499 per year, offering free express
+shipping on all orders and early access to sales. Subscribers can cancel anytime from
+their account settings; cancellation takes effect at the end of the current billing
+cycle, and no partial refunds are given for early cancellation.
+
+Section 7: Customer Support
+Customer support is available Monday to Saturday, 9 AM to 8 PM IST, via chat, email,
+and phone. The average first-response time is under 2 hours during business hours.
+Support is not available on national holidays.
+
+Section 8: Order Cancellation
+Orders can be cancelled free of charge within 1 hour of placing them. After that, if
+the order has not yet shipped, a cancellation fee of Rs. 50 applies. Once an order has
+shipped, it cannot be cancelled and must instead be returned after delivery.
+
+Section 9: Loyalty Program
+The CloudCart Rewards program gives customers 1 point for every Rs. 100 spent. Points
+can be redeemed at checkout at a rate of Rs. 1 per point. Points expire 12 months after
+they are earned if unused.
+
+Section 10: Damaged or Incorrect Items
+If an item arrives damaged or incorrect, customers must report it within 48 hours of
+delivery with photo evidence. CloudCart will then arrange a free replacement or full
+refund, whichever the customer prefers, without requiring the item to be shipped back
+in the case of damaged goods.
