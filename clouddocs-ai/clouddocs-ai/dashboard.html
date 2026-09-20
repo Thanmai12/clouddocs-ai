@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — CloudDocs AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="assets/config.js"></script>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark"><i data-lucide="cloud" style="width:16px;height:16px;color:white;"></i></div>CloudDocs AI</div>
+    <a class="side-link active" href="dashboard.html"><i data-lucide="layout-dashboard" style="width:17px;height:17px;"></i>Dashboard</a>
+    <a class="side-link" href="upload.html"><i data-lucide="upload-cloud" style="width:17px;height:17px;"></i>Upload Document</a>
+    <a class="side-link" href="#"><i data-lucide="folder" style="width:17px;height:17px;"></i>My Documents</a>
+    <a class="side-link" href="chat.html"><i data-lucide="message-circle-question" style="width:17px;height:17px;"></i>Ask Questions</a>
+    <a class="side-link" href="#"><i data-lucide="settings" style="width:17px;height:17px;"></i>Settings</a>
+    <div class="sidebar-footer">
+      <div class="groq-title"><i data-lucide="zap" style="width:14px;height:14px;color:#F5C94B;"></i> Groq</div>
+      <div class="groq-sub">Fast · Free · Llama 3</div>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <div class="topbar">
+      <div>
+        <h1>Good Morning, User! 👋</h1>
+        <p>Your document is ready. Start asking questions or upload a new one.</p>
+      </div>
+      <div class="avatar"></div>
+    </div>
+
+    <div class="stat-grid" id="statGrid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#EEF0FF;color:#4F46E5;"><i data-lucide="files"></i></div>
+        <div><div class="stat-num" id="statTotal">–</div><div class="stat-label">Total Documents</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#E9F9EF;color:#16A34A;"><i data-lucide="check-circle-2"></i></div>
+        <div><div class="stat-num" id="statReady">–</div><div class="stat-label">Ready for Q&amp;A</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#FDF3E8;color:#D97706;"><i data-lucide="loader-circle"></i></div>
+        <div><div class="stat-num" id="statProcessing">–</div><div class="stat-label">Processing</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>Recent Documents</h2>
+        <a href="upload.html">Upload New</a>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Status</th><th>Uploaded on</th><th></th></tr></thead>
+        <tbody id="docRows">
+          <tr><td colspan="4" style="color:var(--slate-400);text-align:center;padding:24px;">Loading documents...</td></tr>
+        </tbody>
+      </table>
+      <div class="quote-card">
+        "The best way to predict the future is to create it."
+        <span>— Peter Drucker</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/api.js"></script>
+<script>
+  lucide.createIcons();
+
+  function badgeFor(status) {
+    if (status === 'ready') return '<span class="badge ready">Ready</span>';
+    if (status === 'failed') return '<span class="badge processing" style="background:#FDECEC;color:#DC2626;">Failed</span>';
+    return `<span class="badge processing">${status}</span>`;
+  }
+
+  function actionFor(doc) {
+    if (doc.status === 'ready') return `<a href="chat.html?id=${doc.id}" style="color:var(--indigo-600);font-weight:600;">Ask →</a>`;
+    if (doc.status === 'failed') return `<span style="color:var(--slate-400);">—</span>`;
+    return `<a href="processing.html?id=${doc.id}" style="color:var(--indigo-600);font-weight:600;">View →</a>`;
+  }
+
+  async function loadDashboard() {
+    const rowsEl = document.getElementById('docRows');
+    try {
+      const docs = await apiListDocuments();
+
+      document.getElementById('statTotal').textContent = docs.length;
+      document.getElementById('statReady').textContent = docs.filter(d => d.status === 'ready').length;
+      document.getElementById('statProcessing').textContent = docs.filter(d => !['ready', 'failed'].includes(d.status)).length;
+
+      if (!docs.length) {
+        rowsEl.innerHTML = `<tr><td colspan="4" style="color:var(--slate-400);text-align:center;padding:24px;">No documents yet — <a href="upload.html" style="color:var(--indigo-600);font-weight:600;">upload your first one</a>.</td></tr>`;
+        return;
+      }
+
+      rowsEl.innerHTML = docs.slice(0, 8).map(doc => `
+        <tr>
+          <td><div class="file-cell"><div class="file-ico"><i data-lucide="file-text" style="width:15px;height:15px;"></i></div>${doc.filename}</div></td>
+          <td>${badgeFor(doc.status)}</td>
+          <td style="color:var(--slate-400);">${new Date(doc.created_at).toLocaleDateString()}</td>
+          <td>${actionFor(doc)}</td>
+        </tr>`).join('');
+      lucide.createIcons();
+    } catch (err) {
+      rowsEl.innerHTML = `<tr><td colspan="4" style="color:#DC2626;text-align:center;padding:24px;">Could not load documents: ${err.message}</td></tr>`;
+    }
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>
