@@ -1,8 +1,12 @@
 import chromadb
+from chromadb.config import Settings as ChromaSettings
 
 from app.config import settings
 
-_client = chromadb.PersistentClient(path=settings.chroma_persist_dir)
+_client = chromadb.PersistentClient(
+    path=settings.chroma_persist_dir,
+    settings=ChromaSettings(anonymized_telemetry=False),
+)
 
 
 def get_collection(document_id: str):
