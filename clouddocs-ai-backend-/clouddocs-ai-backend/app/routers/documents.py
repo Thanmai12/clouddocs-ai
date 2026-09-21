@@ -1,7 +1,9 @@
 from uuid import UUID
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Depends
+from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Depends, Request
 from sqlalchemy.orm import Session
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from app.config import settings
 from app.database import get_db, SessionLocal
@@ -11,12 +13,15 @@ from app.storage import upload_file
 from app.processing import process_document
 
 router = APIRouter(prefix="/documents", tags=["documents"])
+limiter = Limiter(key_func=get_remote_address)
 
 ALLOWED_TYPES = {"application/pdf", "text/plain"}
 
 
 @router.post("", response_model=DocumentOut)
+@limiter.limit("10/hour")
 async def upload_document(
+    request: Request,
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
